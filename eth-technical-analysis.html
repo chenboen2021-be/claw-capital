@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETH-USD 技术分析报告 | CLAW CAPITAL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #0a0e17;
+            color: #e0e6ed;
+            line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+        .header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 24px 28px; margin-bottom: 20px;
+            background: linear-gradient(135deg, #1a1f2e 0%, #141926 100%);
+            border: 1px solid #2a3040; border-radius: 16px;
+        }
+        .header-left h1 { font-size: 24px; font-weight: 700; color: #fff; }
+        .header-left .subtitle { font-size: 13px; color: #6b7a90; margin-top: 4px; }
+        .price-display { text-align: right; }
+        .price-display .price { font-size: 36px; font-weight: 800; color: #42a5f5; }
+        .price-display .change { font-size: 16px; margin-top: 2px; }
+        .change.down { color: #ff5252; }
+        .price-display .time { font-size: 12px; color: #6b7a90; margin-top: 4px; }
+        .verdict {
+            padding: 18px 28px; margin-bottom: 20px; border-radius: 12px;
+            border-left: 4px solid #42a5f5;
+            background: linear-gradient(90deg, rgba(66,165,245,0.08) 0%, transparent 100%);
+        }
+        .verdict .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #42a5f5; font-weight: 600; }
+        .verdict .action { font-size: 20px; font-weight: 700; color: #42a5f5; margin-top: 4px; }
+        .verdict .detail { font-size: 13px; color: #8a95a5; margin-top: 6px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .card {
+            background: #141926; border: 1px solid #1e2736; border-radius: 12px;
+            padding: 20px 24px;
+        }
+        .card-title {
+            font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px;
+            color: #6b7a90; font-weight: 600; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-title .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .ind-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #1a2030;
+        }
+        .ind-row:last-child { border-bottom: none; }
+        .ind-label { font-size: 13px; color: #8a95a5; }
+        .ind-value { font-size: 14px; font-weight: 600; }
+        .ind-signal {
+            font-size: 11px; padding: 2px 10px; border-radius: 20px;
+            font-weight: 600; margin-left: 10px;
+        }
+        .sig-buy { background: rgba(0,230,118,0.12); color: #00e676; }
+        .sig-sell { background: rgba(255,82,82,0.12); color: #ff5252; }
+        .sig-neutral { background: rgba(255,171,0,0.12); color: #ffab00; }
+        .sig-bearish { background: rgba(255,82,82,0.12); color: #ff5252; }
+        .sig-bullish { background: rgba(0,230,118,0.12); color: #00e676; }
+        .full-width { grid-column: 1 / -1; }
+        .tf-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .tf-card {
+            text-align: center; padding: 14px 8px; border-radius: 10px;
+            background: #1a2030; border: 1px solid #252d3d;
+        }
+        .tf-card.active { border-color: #3d4f6f; background: #1e2840; }
+        .tf-label { font-size: 11px; color: #6b7a90; text-transform: uppercase; letter-spacing: 1px; }
+        .tf-bias { font-size: 15px; font-weight: 700; margin-top: 6px; }
+        .tf-rsi { font-size: 12px; color: #8a95a5; margin-top: 4px; }
+        .tf-macd { font-size: 11px; margin-top: 2px; }
+        .alignment-bar {
+            display: flex; height: 36px; border-radius: 8px; overflow: hidden;
+            margin-top: 14px; gap: 2px;
+        }
+        .align-seg {
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+        }
+        .align-buy { background: rgba(0,230,118,0.25); color: #00e676; }
+        .align-sell { background: rgba(255,82,82,0.25); color: #ff5252; }
+        .align-neutral { background: rgba(255,171,0,0.15); color: #ffab00; }
+        .sr-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a2030; }
+        .sr-row:last-child { border-bottom: none; }
+        .sr-level { font-size: 13px; font-weight: 600; }
+        .sr-price { font-size: 14px; font-weight: 700; }
+        .sr-dist { font-size: 12px; color: #6b7a90; }
+        .sr-resistance .sr-level { color: #ff5252; }
+        .sr-resistance .sr-price { color: #ff5252; }
+        .sr-support .sr-level { color: #00e676; }
+        .sr-support .sr-price { color: #00e676; }
+        .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .signal-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 12px; border-radius: 8px; background: #1a2030;
+            font-size: 12px;
+        }
+        .signal-icon { font-size: 16px; flex-shrink: 0; }
+        .footer { text-align: center; padding: 16px; font-size: 11px; color: #4a5568; }
+        .confluence {
+            padding: 16px 24px; margin-bottom: 20px; border-radius: 12px;
+            background: linear-gradient(135deg, #141926, #1a2030);
+            border: 1px solid #2a3040;
+        }
+        .conf-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .conf-row:last-child { margin-bottom: 0; }
+        .conf-label { font-size: 12px; color: #6b7a90; min-width: 80px; }
+        .conf-val { font-size: 13px; font-weight: 600; }
+        .warn-box { margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-size: 12px; }
+        .warn-red { background: rgba(255,82,82,0.08); color: #ff8a80; }
+        .warn-orange { background: rgba(255,171,0,0.08); color: #ffd180; }
+        .warn-blue { background: rgba(66,165,245,0.08); color: #90caf9; }
+        .compare {
+            padding: 16px 24px; margin-bottom: 20px; border-radius: 12px;
+            background: #141926; border: 1px solid #1e2736;
+        }
+        .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .compare-col-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; text-align: center; padding: 6px; border-radius: 6px; }
+        .compare-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+        .compare-label { font-size: 12px; color: #8a95a5; }
+        .compare-val { font-size: 12px; font-weight: 700; }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .tf-grid { grid-template-columns: repeat(3, 1fr); }
+            .header { flex-direction: column; gap: 12px; }
+            .price-display { text-align: left; }
+            .compare-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>⟠ ETH/USDT 技术分析</h1>
+                <div class="subtitle">Binance · 日线级别 · CLAW CAPITAL</div>
+            </div>
+            <div class="price-display">
+                <div class="price">$2,237.08</div>
+                <div class="change down">▼ -0.13%</div>
+                <div class="time">2026-04-08 11:01 CST</div>
+            </div>
+        </div>
+
+        <div class="verdict">
+            <div class="label">综合判定 · Overall Rating</div>
+            <div class="action">⏸️ 持有观望 (HOLD) — 评分 2/5</div>
+            <div class="detail">日线 MACD 金叉强劲（+17.78），价格站稳 EMA20/50 上方。但周线+日线偏空形成顶部压制，且 4H/1H RSI 已进入超买区。多空分歧严重，建议持仓不动，等待方向明朗。</div>
+        </div>
+
+        <!-- Multi-Timeframe -->
+        <div class="card full-width" style="margin-bottom: 16px;">
+            <div class="card-title">
+                <span class="dot" style="background: #5c6bc0;"></span>
+                多时间框架对齐分析
+            </div>
+            <div class="tf-grid">
+                <div class="tf-card active">
+                    <div class="tf-label">1W 周线</div>
+                    <div class="tf-bias" style="color: #ff5252;">偏空</div>
+                    <div class="tf-rsi">RSI 41.2</div>
+                    <div class="tf-macd" style="color: #ff5252;">MACD 空头</div>
+                </div>
+                <div class="tf-card">
+                    <div class="tf-label">1D 日线</div>
+                    <div class="tf-bias" style="color: #ff5252;">偏空</div>
+                    <div class="tf-rsi">RSI 60.6</div>
+                    <div class="tf-macd" style="color: #00e676;">MACD 金叉</div>
+                </div>
+                <div class="tf-card">
+                    <div class="tf-label">4H 四小时</div>
+                    <div class="tf-bias" style="color: #00e676;">偏多</div>
+                    <div class="tf-rsi">RSI 72.6 ⚠️</div>
+                    <div class="tf-macd" style="color: #00e676;">MACD 多头</div>
+                </div>
+                <div class="tf-card">
+                    <div class="tf-label">1H 一小时</div>
+                    <div class="tf-bias" style="color: #00e676;">偏多</div>
+                    <div class="tf-rsi">RSI 75.9 ⚠️</div>
+                    <div class="tf-macd" style="color: #00e676;">MACD 多头</div>
+                </div>
+                <div class="tf-card">
+                    <div class="tf-label">15m</div>
+                    <div class="tf-bias" style="color: #ffab00;">中性</div>
+                    <div class="tf-rsi">RSI 65.2</div>
+                    <div class="tf-macd" style="color: #ff5252;">MACD 空头</div>
+                </div>
+            </div>
+            <div class="alignment-bar">
+                <div class="align-seg align-sell" style="flex: 2;">偏空 -2 (1W/1D)</div>
+                <div class="align-seg align-buy" style="flex: 2;">偏多 +2 (4H/1H)</div>
+                <div class="align-seg align-neutral" style="flex: 1;">中性 0 (15m)</div>
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: 13px; color: #8a95a5;">
+                对齐评分：<strong style="color: #42a5f5;">0 混沌/震荡 · 低置信度</strong> — 长短周期完全冲突，方向不明
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">
+                    <span class="dot" style="background: #42a5f5;"></span>
+                    核心指标
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">RSI (14)</span>
+                    <span>
+                        <span class="ind-value">60.58</span>
+                        <span class="ind-signal sig-bullish">偏多 ↓</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">MACD</span>
+                    <span>
+                        <span class="ind-value">柱状图 +17.78</span>
+                        <span class="ind-signal sig-bullish">金叉 ↑ 强劲</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">Stochastic K/D</span>
+                    <span>
+                        <span class="ind-value">81.2 / 71.4</span>
+                        <span class="ind-signal sig-sell">超买 ⚠️</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">ADX 趋势强度</span>
+                    <span>
+                        <span class="ind-value">13.34</span>
+                        <span class="ind-signal sig-neutral">弱趋势</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">布林带位置</span>
+                    <span>
+                        <span class="ind-value">接近上轨</span>
+                        <span class="ind-signal sig-neutral">上轨 $2,240</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">+DI / -DI</span>
+                    <span>
+                        <span class="ind-value">27.78 / 17.04</span>
+                        <span class="ind-signal sig-bullish">+DI > -DI</span>
+                    </span>
+                </div>
+                <div class="warn-box warn-orange">
+                    ⚠️ 4H RSI 72.6 + 1H RSI 75.9 均超买，短线回调压力大
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="dot" style="background: #ab47bc;"></span>
+                    均线系统
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">EMA 20</span>
+                    <span>
+                        <span class="ind-value">$2,112</span>
+                        <span class="ind-signal sig-bullish">价格上方 ✓</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">EMA 50</span>
+                    <span>
+                        <span class="ind-value">$2,152</span>
+                        <span class="ind-signal sig-bullish">价格上方 ✓</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">EMA 100</span>
+                    <span>
+                        <span class="ind-value">$2,368</span>
+                        <span class="ind-signal sig-bearish">价格下方 ✗</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">EMA 200</span>
+                    <span>
+                        <span class="ind-value">$2,690</span>
+                        <span class="ind-signal sig-bearish">价格下方 ✗</span>
+                    </span>
+                </div>
+                <div class="ind-row">
+                    <span class="ind-label">SMA 200</span>
+                    <span>
+                        <span class="ind-value">$2,959</span>
+                        <span class="ind-signal sig-bearish">价格下方 ✗</span>
+                    </span>
+                </div>
+                <div class="warn-box warn-red">
+                    ⚠️ 死亡交叉：EMA50 ($2,152) < EMA200 ($2,690) — 长期偏空
+                </div>
+                <div class="warn-box warn-blue">
+                    💡 价格高于 EMA20/50（+3.9% / +5.8%），短线均线支撑扎实
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="dot" style="background: #ef5350;"></span>
+                    支撑 / 阻力位
+                </div>
+                <div class="sr-row sr-resistance">
+                    <span class="sr-level">R3 阻力</span>
+                    <span><span class="sr-price">$3,090</span></span>
+                </div>
+                <div class="sr-row sr-resistance">
+                    <span class="sr-level">R2 阻力</span>
+                    <span><span class="sr-price">$2,612</span></span>
+                </div>
+                <div class="sr-row sr-resistance">
+                    <span class="sr-level">R1 阻力</span>
+                    <span>
+                        <span class="sr-price">$2,358</span>
+                        <span class="sr-dist">(+5.4%)</span>
+                    </span>
+                </div>
+                <div class="sr-row" style="background: rgba(255,171,0,0.05); border-radius: 6px; padding: 10px 8px;">
+                    <span class="sr-level" style="color: #ffab00;">枢轴点</span>
+                    <span class="sr-price" style="color: #ffab00;">$2,133</span>
+                </div>
+                <div class="sr-row sr-support">
+                    <span class="sr-label">S1 支撑</span>
+                    <span>
+                        <span class="sr-price">$1,880</span>
+                        <span class="sr-dist">(-16.0%)</span>
+                    </span>
+                </div>
+                <div class="sr-row sr-support">
+                    <span class="sr-label">S2 支撑</span>
+                    <span><span class="sr-price">$1,654</span></span>
+                </div>
+                <div class="sr-row sr-support">
+                    <span class="sr-label">S3 支撑</span>
+                    <span><span class="sr-price">$1,176</span></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span class="dot" style="background: #66bb6a;"></span>
+                    关键信号
+                </div>
+                <div class="signal-grid">
+                    <div class="signal-item">
+                        <span class="signal-icon">📈</span>
+                        <span>MACD 金叉强劲（+17.78），中期动能向上</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">✅</span>
+                        <span>价格站稳 EMA20/50 上方，短线结构偏多</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">⚠️</span>
+                        <span>Stochastic 超买（81.2），日线回调风险</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">🔺</span>
+                        <span>价格逼近布林带上轨 $2,240，短期压力</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">📉</span>
+                        <span>周线+日线共振偏空，长期压制明确</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">🔄</span>
+                        <span>多 TF 完全冲突（长空短多），方向不明</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">📊</span>
+                        <span>ADX 13.3 弱趋势 + DI 偏多，震荡偏上</span>
+                    </div>
+                    <div class="signal-item">
+                        <span class="signal-icon">🕯️</span>
+                        <span>今日 K 线实体极小（13%），十字星形态</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confluence -->
+        <div class="confluence">
+            <div class="card-title" style="margin-bottom: 12px;">
+                <span class="dot" style="background: #ffd740;"></span>
+                综合共振分析
+            </div>
+            <div class="conf-row">
+                <span class="conf-label">技术面</span>
+                <span class="conf-val" style="color: #42a5f5;">BUY（评分 2/5）— 但置信度低</span>
+            </div>
+            <div class="conf-row">
+                <span class="conf-label">Reddit 情绪</span>
+                <span class="conf-val" style="color: #ffab00;">中性</span>
+            </div>
+            <div class="conf-row">
+                <span class="conf-label">新闻面</span>
+                <span class="conf-val" style="color: #6b7a90;">暂无即时数据</span>
+            </div>
+            <div class="conf-row">
+                <span class="conf-label">共振置信度</span>
+                <span class="conf-val" style="color: #42a5f5;">低 — 长短周期完全冲突，不构成交易信号</span>
+            </div>
+        </div>
+
+        <!-- 三币对比 -->
+        <div class="compare">
+            <div class="card-title">
+                <span class="dot" style="background: #78909c;"></span>
+                CLAW CAPITAL 三币对比总览
+            </div>
+            <div class="compare-grid">
+                <div>
+                    <div class="compare-col-title" style="background: rgba(0,230,118,0.08); color: #00e676;">₿ BTC — 最强</div>
+                    <div class="compare-item">
+                        <span class="compare-label">价格</span>
+                        <span class="compare-val">$71,311</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">今日</span>
+                        <span class="compare-val" style="color: #ff5252;">-0.85%</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">评分</span>
+                        <span class="compare-val" style="color: #ffab00;">2/5</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">多 TF</span>
+                        <span class="compare-val" style="color: #00e676;">+2 偏多</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">MACD</span>
+                        <span class="compare-val" style="color: #00e676;">+455 ★★★</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">EMA 位置</span>
+                        <span class="compare-val" style="color: #00e676;">高于 EMA50</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">建议</span>
+                        <span class="compare-val" style="color: #ffab00;">谨慎买入</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="compare-col-title" style="background: rgba(66,165,245,0.08); color: #42a5f5;">⟠ ETH — 中性</div>
+                    <div class="compare-item">
+                        <span class="compare-label">价格</span>
+                        <span class="compare-val">$2,237</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">今日</span>
+                        <span class="compare-val" style="color: #ff5252;">-0.13%</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">评分</span>
+                        <span class="compare-val" style="color: #ffab00;">2/5</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">多 TF</span>
+                        <span class="compare-val" style="color: #42a5f5;">0 混沌</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">MACD</span>
+                        <span class="compare-val" style="color: #00e676;">+17.8 ★★</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">EMA 位置</span>
+                        <span class="compare-val" style="color: #00e676;">高于 EMA50</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">建议</span>
+                        <span class="compare-val" style="color: #42a5f5;">持有观望</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="compare-col-title" style="background: rgba(255,82,82,0.08); color: #ff5252;">◎ SOL — 最弱</div>
+                    <div class="compare-item">
+                        <span class="compare-label">价格</span>
+                        <span class="compare-val">$84.58</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">今日</span>
+                        <span class="compare-val" style="color: #ff5252;">-1.15%</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">评分</span>
+                        <span class="compare-val" style="color: #ff5252;">1/5</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">多 TF</span>
+                        <span class="compare-val" style="color: #ff5252;">-1 偏空</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">MACD</span>
+                        <span class="compare-val" style="color: #ffab00;">+0.20 ★</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">EMA 位置</span>
+                        <span class="compare-val" style="color: #ff5252;">低于 EMA50</span>
+                    </div>
+                    <div class="compare-item">
+                        <span class="compare-label">建议</span>
+                        <span class="compare-val" style="color: #ff5252;">谨慎观望</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 14px; padding: 12px 14px; background: rgba(0,230,118,0.04); border-radius: 8px; font-size: 12px; color: #90caf9; line-height: 1.8;">
+                💡 <strong>仓位建议：</strong>当前三币排序 <strong>BTC > ETH > SOL</strong>。BTC 是唯一多时间框架偏多的标的，应作为核心持仓。ETH 虽日线 MACD 强劲但长空短多冲突严重，建议维持现有仓位不做方向性操作。SOL 最弱，不建议加仓。若需调仓，优先 BTC。
+            </div>
+        </div>
+
+        <!-- Trading Rules -->
+        <div class="card full-width">
+            <div class="card-title">
+                <span class="dot" style="background: #78909c;"></span>
+                交易规则 & 建议
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <div style="font-size: 13px; font-weight: 600; color: #e0e6ed; margin-bottom: 10px;">📋 多时间框架规则</div>
+                    <div style="font-size: 12px; color: #8a95a5; line-height: 2;">
+                        ① 周线偏空 ❌ — 不追高做多<br>
+                        ② 日线偏空 ❌ — 但 MACD 金叉提供支撑<br>
+                        ③ 4H 偏多但超买 ⚠️ — 不宜追涨<br>
+                        ④ 1H 偏多但超买 ⚠️ — 回调后再考虑<br>
+                        ⑤ 周线+日线偏空 → 当前不适合新建多头仓位
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 13px; font-weight: 600; color: #e0e6ed; margin-bottom: 10px;">🎯 操作建议</div>
+                    <div style="font-size: 12px; color: #8a95a5; line-height: 2;">
+                        <span style="color: #42a5f5;">策略：</span>持仓不动，等待方向明朗<br>
+                        <span style="color: #00e676;">加仓条件：</span>MACD 持续放大 + 周线 RSI 升破 50<br>
+                        <span style="color: #ff5252;">止损参考：</span>S1 $1,880（-16.0%）<br>
+                        <span style="color: #42a5f5;">反弹目标：</span>EMA100 $2,368 → R1 $2,358<br>
+                        <span style="color: #ffab00;">关键观察：</span>能否突破布林带上轨 $2,240
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            CLAW CAPITAL · 数据来源: Binance / TradingView · 仅供研究参考，不构成投资建议
+        </div>
+    </div>
+</body>
+</html>
