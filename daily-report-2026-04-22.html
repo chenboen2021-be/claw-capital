@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLAW CAPITAL 每日晨报 | 2026-04-22</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'SF Pro Display', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0e17;
+            color: #e0e6ed;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f1923 0%, #1a2332 100%);
+            border: 1px solid #1e2d3d;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .header .logo { font-size: 14px; letter-spacing: 6px; color: #4a9eff; margin-bottom: 8px; }
+        .header h1 { font-size: 28px; color: #ffffff; margin-bottom: 6px; }
+        .header .date { font-size: 14px; color: #6b7b8d; }
+        .header .update-time { font-size: 12px; color: #4a5568; margin-top: 4px; }
+
+        /* Fear & Greed */
+        .fear-greed {
+            background: #111927;
+            border: 1px solid #1e2d3d;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .fear-greed .label { font-size: 14px; color: #6b7b8d; }
+        .fear-greed .value { font-size: 32px; font-weight: 700; color: #f59e0b; }
+        .fear-greed .text { font-size: 13px; color: #d97706; margin-left: 8px; }
+        .fear-greed .meter {
+            width: 200px; height: 8px; background: #1e2d3d; border-radius: 4px; overflow: hidden;
+        }
+        .fear-greed .meter-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ef4444, #f59e0b); width: 32%; }
+
+        /* Price Overview */
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .price-card {
+            background: #111927;
+            border: 1px solid #1e2d3d;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .price-card:hover { transform: translateY(-2px); border-color: #2a3f55; }
+        .price-card .coin-name { font-size: 13px; color: #6b7b8d; margin-bottom: 4px; }
+        .price-card .price { font-size: 26px; font-weight: 700; color: #fff; }
+        .price-card .change { font-size: 14px; font-weight: 600; margin-top: 4px; }
+        .price-up { color: #ef4444; }
+        .price-down { color: #22c55e; }
+
+        /* Section */
+        .section {
+            background: #111927;
+            border: 1px solid #1e2d3d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 18px; font-weight: 700; color: #fff;
+            margin-bottom: 20px; padding-bottom: 12px;
+            border-bottom: 1px solid #1e2d3d;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title .icon { font-size: 20px; }
+
+        /* Coin Analysis */
+        .coin-section { margin-bottom: 32px; }
+        .coin-section:last-child { margin-bottom: 0; }
+        .coin-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; padding-bottom: 12px;
+            border-bottom: 1px solid #1e2d3d;
+        }
+        .coin-name { font-size: 20px; font-weight: 700; color: #fff; }
+        .coin-signal {
+            padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .signal-sell { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .signal-buy { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .signal-neutral { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .signal-strong-sell { background: rgba(34,197,94,0.25); color: #16a34a; }
+
+        /* Timeframe Grid */
+        .tf-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tf-card {
+            background: #0d1420;
+            border: 1px solid #1a2535;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .tf-card .tf-label { font-size: 11px; color: #6b7b8d; margin-bottom: 4px; }
+        .tf-card .tf-signal { font-size: 13px; font-weight: 600; }
+
+        /* Indicator Grid */
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .indicator-item {
+            background: #0d1420;
+            border: 1px solid #1a2535;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .indicator-item .label { font-size: 13px; color: #8899aa; }
+        .indicator-item .value { font-size: 14px; font-weight: 600; color: #fff; }
+        .indicator-item .signal { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+
+        /* Support/Resistance */
+        .sr-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .sr-box {
+            background: #0d1420;
+            border: 1px solid #1a2535;
+            border-radius: 8px;
+            padding: 14px 16px;
+        }
+        .sr-box .title { font-size: 12px; color: #6b7b8d; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .sr-box .level { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+        .sr-box .level-label { color: #8899aa; }
+        .sr-box .level-value { color: #fff; font-weight: 600; }
+
+        /* Action Box */
+        .action-box {
+            background: linear-gradient(135deg, #111a28 0%, #0d1420 100%);
+            border: 1px solid #1e3050;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-top: 16px;
+        }
+        .action-box .action-title { font-size: 14px; font-weight: 700; color: #4a9eff; margin-bottom: 8px; }
+        .action-box .action-item { font-size: 13px; color: #c0c8d0; margin-bottom: 4px; }
+        .action-box .action-item strong { color: #fff; }
+        .action-box .action-item .highlight { color: #4a9eff; }
+
+        /* News */
+        .news-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #1a2535;
+        }
+        .news-item:last-child { border-bottom: none; }
+        .news-item .news-title { font-size: 14px; color: #fff; margin-bottom: 4px; }
+        .news-item .news-summary { font-size: 13px; color: #8899aa; }
+        .news-item .news-source { font-size: 11px; color: #4a5568; margin-top: 4px; }
+
+        /* Risk */
+        .risk-box {
+            background: rgba(239,68,68,0.05);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .risk-box .risk-title { font-size: 14px; font-weight: 700; color: #ef4444; margin-bottom: 8px; }
+        .risk-box ul { padding-left: 20px; }
+        .risk-box li { font-size: 13px; color: #c0c8d0; margin-bottom: 4px; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #4a5568;
+            font-size: 12px;
+        }
+
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .tag-up { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .tag-down { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .tag-neutral { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+        @media (max-width: 768px) {
+            .price-grid, .tf-grid, .indicator-grid, .sr-grid { grid-template-columns: 1fr; }
+            .price-card .price { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">CLAW CAPITAL</div>
+        <h1>📊 每日晨报</h1>
+        <div class="date">2026 年 4 月 22 日 · 星期三</div>
+        <div class="update-time">数据更新时间：09:00 CST | 数据来源：CoinGecko / CoinLore / Alternative.me / CoinDesk</div>
+    </div>
+
+    <!-- Fear & Greed Index -->
+    <div class="fear-greed">
+        <div>
+            <div class="label">恐慌与贪婪指数</div>
+            <div style="display:flex;align-items:baseline;margin-top:4px;">
+                <span class="value">32</span>
+                <span class="text">恐惧 (Fear)</span>
+            </div>
+        </div>
+        <div class="meter"><div class="meter-fill"></div></div>
+        <div style="text-align:right;">
+            <div style="font-size:12px;color:#6b7b8d;">较昨日 26 回升</div>
+            <div style="font-size:11px;color:#4a5568;margin-top:2px;">极度恐惧 < 25 · 恐惧 < 45 · 中性 45-55</div>
+        </div>
+    </div>
+
+    <!-- Price Overview -->
+    <div class="price-grid">
+        <div class="price-card">
+            <div class="coin-name">Bitcoin (BTC)</div>
+            <div class="price">$76,311</div>
+            <div class="change price-up">▲ +0.30%</div>
+            <div style="font-size:12px;color:#6b7b8d;margin-top:6px;">市值 $1.53T · 24h Vol $41.5B</div>
+        </div>
+        <div class="price-card">
+            <div class="coin-name">Ethereum (ETH)</div>
+            <div class="price">$2,324.75</div>
+            <div class="change price-up">▲ +0.12%</div>
+            <div style="font-size:12px;color:#6b7b8d;margin-top:6px;">市值 $280.6B · 24h Vol $16.2B</div>
+        </div>
+        <div class="price-card">
+            <div class="coin-name">Solana (SOL)</div>
+            <div class="price">$86.45</div>
+            <div class="change price-up">▲ +0.92%</div>
+            <div style="font-size:12px;color:#6b7b8d;margin-top:6px;">市值 $49.8B · 24h Vol $3.4B</div>
+        </div>
+    </div>
+
+    <!-- ==================== BTC Analysis ==================== -->
+    <div class="section">
+        <div class="section-title"><span class="icon">₿</span> Bitcoin (BTCUSDT) 技术分析</div>
+        <div class="coin-section">
+            <div class="coin-header">
+                <div class="coin-name">BTC / USDT</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:13px;color:#6b7b8d;">Score: -1.5</span>
+                    <span class="coin-signal signal-sell">SELL · 偏空</span>
+                </div>
+            </div>
+
+            <!-- Multi-Timeframe -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7b8d;margin-bottom:10px;">多时间框架方向</div>
+                <div class="tf-grid">
+                    <div class="tf-card">
+                        <div class="tf-label">1W 周线</div>
+                        <div class="tf-signal" style="color:#ef4444;">BUY</div>
+                        <div style="font-size:10px;color:#6b7b8d;">EMA200 上方</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">1D 日线</div>
+                        <div class="tf-signal" style="color:#22c55e;">SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">死亡交叉</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">4H 四小时</div>
+                        <div class="tf-signal" style="color:#22c55e;">SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">MACD 死叉</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">1H 小时线</div>
+                        <div class="tf-signal" style="color:#22c55e;">SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">弱势震荡</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Indicators -->
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <span class="label">RSI (14)</span>
+                    <span class="value">61.42</span>
+                    <span class="signal tag tag-neutral">中性</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">MACD</span>
+                    <span class="value">金叉</span>
+                    <span class="signal tag tag-up">偏多</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">ADX</span>
+                    <span class="value">Medium</span>
+                    <span class="signal tag tag-neutral">中等</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">ATR</span>
+                    <span class="value">2.8%</span>
+                    <span class="signal tag tag-neutral">正常</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">Momentum</span>
+                    <span class="value">Bearish</span>
+                    <span class="signal tag tag-down">偏空</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">Pattern</span>
+                    <span class="value">Bullish</span>
+                    <span class="signal tag tag-up">看涨形态</span>
+                </div>
+            </div>
+
+            <!-- EMA Structure -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7b8d;margin-bottom:10px;">EMA 结构（日线）</div>
+                <div class="indicator-grid">
+                    <div class="indicator-item">
+                        <span class="label">EMA 20</span>
+                        <span class="value" style="color:#22c55e;">$78,003</span>
+                        <span class="signal tag tag-down">价格在下方</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">EMA 100</span>
+                        <span class="value" style="color:#f59e0b;">$75,342</span>
+                        <span class="signal tag tag-up">价格在上方</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">EMA 200</span>
+                        <span class="value" style="color:#f59e0b;">$78,500+</span>
+                        <span class="signal tag tag-down">价格在下方</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">EMA 50 vs 200</span>
+                        <span class="value">死亡交叉</span>
+                        <span class="signal tag tag-down">空头</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support / Resistance -->
+            <div class="sr-grid">
+                <div class="sr-box">
+                    <div class="title">阻力位 (Resistance)</div>
+                    <div class="level"><span class="level-label">R3</span><span class="level-value">$80,000</span></div>
+                    <div class="level"><span class="level-label">R2</span><span class="level-value">$78,500</span></div>
+                    <div class="level"><span class="level-label">R1</span><span class="level-value">$77,500</span></div>
+                </div>
+                <div class="sr-box">
+                    <div class="title">支撑位 (Support)</div>
+                    <div class="level"><span class="level-label">S1</span><span class="level-value">$75,342 (EMA100)</span></div>
+                    <div class="level"><span class="level-label">S2</span><span class="level-value">$73,000</span></div>
+                    <div class="level"><span class="level-label">S3</span><span class="level-value">$70,000</span></div>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <div class="action-box">
+                <div class="action-title">📋 操作建议</div>
+                <div class="action-item"><strong>方向：</strong><span class="tag tag-down">谨慎偏空</span> — 日线死亡交叉未扭转，但 MACD 金叉 + 周线多头提供支撑</div>
+                <div class="action-item"><strong>策略：</strong><span class="highlight">观望为主，短线可轻仓博弈反弹</span></div>
+                <div class="action-item"><strong>入场区间：</strong>$75,000 - $75,500（回踩 EMA100 附近）</div>
+                <div class="action-item"><strong>止损位：</strong>$73,800（跌破则空头加速）</div>
+                <div class="action-item"><strong>止盈位：</strong>$77,500（R1）→ $78,500（R2/EMA200）</div>
+                <div class="action-item"><strong>关键位：</strong>多空分水岭 <strong>$78,003</strong>（EMA20），站上方趋势转暖</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== ETH Analysis ==================== -->
+    <div class="section">
+        <div class="section-title"><span class="icon">Ξ</span> Ethereum (ETHUSDT) 技术分析</div>
+        <div class="coin-section">
+            <div class="coin-header">
+                <div class="coin-name">ETH / USDT</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:13px;color:#6b7b8d;">Score: -1.5</span>
+                    <span class="coin-signal signal-sell">SELL · 偏空</span>
+                </div>
+            </div>
+
+            <!-- Multi-Timeframe -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7b8d;margin-bottom:10px;">多时间框架方向</div>
+                <div class="tf-grid">
+                    <div class="tf-card">
+                        <div class="tf-label">1W 周线</div>
+                        <div class="tf-signal" style="color:#22c55e;">SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">深度空头</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">1D 日线</div>
+                        <div class="tf-signal" style="color:#22c55e;">SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">弱势震荡</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">4H 四小时</div>
+                        <div class="tf-signal" style="color:#f59e0b;">NEUTRAL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">方向不明</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">1H 小时线</div>
+                        <div class="tf-signal" style="color:#f59e0b;">NEUTRAL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">横盘</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Indicators -->
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <span class="label">RSI (14)</span>
+                    <span class="value">55.68</span>
+                    <span class="signal tag tag-neutral">中性</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">MACD</span>
+                    <span class="value">62.17 / 56.80</span>
+                    <span class="signal tag tag-neutral">中性</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">ADX</span>
+                    <span class="value">22.10</span>
+                    <span class="signal tag tag-neutral">中等趋势</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">CCI (20)</span>
+                    <span class="value">55.15</span>
+                    <span class="signal tag tag-neutral">中性</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">ATR</span>
+                    <span class="value">4.2%</span>
+                    <span class="signal tag tag-neutral">正常</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">Bollinger</span>
+                    <span class="value">$2,007 - $2,456</span>
+                    <span class="signal tag tag-neutral">中性带内</span>
+                </div>
+            </div>
+
+            <!-- EMA Structure -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7b8d;margin-bottom:10px;">EMA 结构（日线）</div>
+                <div class="indicator-grid">
+                    <div class="indicator-item">
+                        <span class="label">EMA 20</span>
+                        <span class="value" style="color:#22c55e;">$2,254</span>
+                        <span class="signal tag tag-up">价格在上方 ✓</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">EMA 50</span>
+                        <span class="value" style="color:#22c55e;">$2,212</span>
+                        <span class="signal tag tag-up">价格在上方 ✓</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">EMA 100</span>
+                        <span class="value" style="color:#ef4444;">$2,356</span>
+                        <span class="signal tag tag-down">价格在下方</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">SMA 50</span>
+                        <span class="value" style="color:#22c55e;">$2,144</span>
+                        <span class="signal tag tag-up">价格在上方 ✓</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support / Resistance -->
+            <div class="sr-grid">
+                <div class="sr-box">
+                    <div class="title">阻力位 (Resistance)</div>
+                    <div class="level"><span class="level-label">R3</span><span class="level-value">$2,456 (BB上轨)</span></div>
+                    <div class="level"><span class="level-label">R2</span><span class="level-value">$2,400</span></div>
+                    <div class="level"><span class="level-label">R1</span><span class="level-value">$2,356 (EMA100)</span></div>
+                </div>
+                <div class="sr-box">
+                    <div class="title">支撑位 (Support)</div>
+                    <div class="level"><span class="level-label">S1</span><span class="level-value">$2,254 (EMA20)</span></div>
+                    <div class="level"><span class="level-label">S2</span><span class="level-value">$2,106 - $2,176</span></div>
+                    <div class="level"><span class="level-label">S3</span><span class="level-value">$2,007 (BB下轨)</span></div>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <div class="action-box">
+                <div class="action-title">📋 操作建议</div>
+                <div class="action-item"><strong>方向：</strong><span class="tag tag-down">偏空</span> — 周线+日线双 SELL，价格低于 EMA100</div>
+                <div class="action-item"><strong>策略：</strong><span class="highlight">观望偏空，等待 $2,106-$2,176 支撑区域测试</span></div>
+                <div class="action-item"><strong>入场区间：</strong>$2,106 - $2,176（若回踩支撑区企稳）</div>
+                <div class="action-item"><strong>止损位：</strong>$2,000（布林下轨下方）</div>
+                <div class="action-item"><strong>止盈位：</strong>$2,356（EMA100）→ $2,456（布林上轨）</div>
+                <div class="action-item"><strong>关键位：</strong>EMA100 <strong>$2,356</strong> 是趋势反转分界线，站上方才有走强基础</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SOL Analysis ==================== -->
+    <div class="section">
+        <div class="section-title"><span class="icon">◎</span> Solana (SOLUSDT) 技术分析</div>
+        <div class="coin-section">
+            <div class="coin-header">
+                <div class="coin-name">SOL / USDT</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:13px;color:#6b7b8d;">Score: -2.5</span>
+                    <span class="coin-signal signal-strong-sell">STRONG SELL · 深度偏空</span>
+                </div>
+            </div>
+
+            <!-- Multi-Timeframe -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7b8d;margin-bottom:10px;">多时间框架方向</div>
+                <div class="tf-grid">
+                    <div class="tf-card">
+                        <div class="tf-label">1W 周线</div>
+                        <div class="tf-signal" style="color:#22c55e;">STRONG SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">极弱趋势</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">1D 日线</div>
+                        <div class="tf-signal" style="color:#22c55e;">STRONG SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">底部震荡</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">4H 四小时</div>
+                        <div class="tf-signal" style="color:#f59e0b;">NEUTRAL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">无方向</div>
+                    </div>
+                    <div class="tf-card">
+                        <div class="tf-label">1H 小时线</div>
+                        <div class="tf-signal" style="color:#22c55e;">SELL</div>
+                        <div style="font-size:10px;color:#6b7b8d;">弱势</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Indicators -->
+            <div class="indicator-grid">
+                <div class="indicator-item">
+                    <span class="label">RSI (14)</span>
+                    <span class="value">50.40</span>
+                    <span class="signal tag tag-neutral">中性</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">ADX</span>
+                    <span class="value">Weak</span>
+                    <span class="signal tag tag-down">极弱趋势</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">ATR</span>
+                    <span class="value">4.5%</span>
+                    <span class="signal tag tag-neutral">正常</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="label">Momentum</span>
+                    <span class="value">Bearish</span>
+                    <span class="signal tag tag-down">偏空</span>
+                </div>
+            </div>
+
+            <!-- EMA Structure -->
+            <div style="margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7b8d;margin-bottom:10px;">EMA 结构（日线）</div>
+                <div class="indicator-grid">
+                    <div class="indicator-item">
+                        <span class="label">价格 vs EMA200</span>
+                        <span class="value">约 73%</span>
+                        <span class="signal tag tag-down">严重偏离</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">EMA200 估算</span>
+                        <span class="value" style="color:#ef4444;">~$117-120</span>
+                        <span class="signal tag tag-down">价格远低于</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">ATH 回撤</span>
+                        <span class="value">-70.5%</span>
+                        <span class="signal tag tag-down">深度回撤</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="label">52周低点</span>
+                        <span class="value" style="color:#ef4444;">$68.69</span>
+                        <span class="signal tag tag-down">仅 20% 距离</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support / Resistance -->
+            <div class="sr-grid">
+                <div class="sr-box">
+                    <div class="title">阻力位 (Resistance)</div>
+                    <div class="level"><span class="level-label">R3</span><span class="level-value">$95.00</span></div>
+                    <div class="level"><span class="level-label">R2</span><span class="level-value">$90.00</span></div>
+                    <div class="level"><span class="level-label">R1</span><span class="level-value">$87.82</span></div>
+                </div>
+                <div class="sr-box">
+                    <div class="title">支撑位 (Support)</div>
+                    <div class="level"><span class="level-label">S1</span><span class="level-value">$84.00</span></div>
+                    <div class="level"><span class="level-label">S2</span><span class="level-value">$80.00</span></div>
+                    <div class="level"><span class="level-label">S3</span><span class="level-value">$68.69 (52周低)</span></div>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <div class="action-box">
+                <div class="action-title">📋 操作建议</div>
+                <div class="action-item"><strong>方向：</strong><span class="tag tag-down">深度偏空</span> — 周线+日线 STRONG_SELL，ADX 极弱趋势，价格仅为 EMA200 的 73%</div>
+                <div class="action-item"><strong>策略：</strong><span class="highlight">空仓观望为主，仅超短线 $80 附近博弈技术性反弹</span></div>
+                <div class="action-item"><strong>入场区间：</strong>$80.00 - $84.00（若快速回踩至该区间企稳）</div>
+                <div class="action-item"><strong>止损位：</strong>$77.00（跌破则下行加速，逼近 52 周低点）</div>
+                <div class="action-item"><strong>止盈位：</strong>$87.82（日内高点）→ $90.00（心理关口）</div>
+                <div class="action-item"><strong>风险提示：</strong>距 52 周低点 $68.69 仅 20%，底部结构尚未确认，切勿重仓抄底</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== News ==================== -->
+    <div class="section">
+        <div class="section-title"><span class="icon">📰</span> 今日市场要闻</div>
+
+        <div class="news-item">
+            <div class="news-title">1. Strategy 大举增持 34,164 BTC（$25.4 亿）</div>
+            <div class="news-summary">Strategy（原 MicroStrategy）完成 2024 年 11 月以来最大单笔 BTC 采购，总持仓达 815,061 BTC，均价约 $74,100。巨鲸持续买入释放中长期看多信号。</div>
+            <div class="news-source">CoinGabbar / Caleb & Brown</div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-title">2. 参议院 CLARITY 法案推进艰难，稳定币收益率争议持续</div>
+            <div class="news-summary">围绕稳定币收益率分配的争论导致 CLARITY 法案多次延期。市场预期通过概率 80-90%，但参议院可用议程时间正在减少，4 月底前能否出最终文本存疑。</div>
+            <div class="news-source">CoinDesk</div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-title">3. Kelp DAO $2.92 亿攻击事件持续发酵</div>
+            <div class="news-summary">Jefferies 警告传统金融机构可能因此事件暂停区块链计划，强调 DeFi 安全性仍是主流采用的核心障碍。</div>
+            <div class="news-source">CoinDesk</div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-title">4. 纽约起诉 Coinbase 和 Gemini 预测市场业务</div>
+            <div class="news-summary">纽约成为最新一个认为体育和娱乐预测市场违反州赌博法律的州。Coinbase 和 Robinhood 预测市场业务面临监管压力。</div>
+            <div class="news-source">CoinDesk</div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-title">5. BTC 网络跨越 945,000 区块里程碑</div>
+            <div class="news-summary">比特币网络区块高度突破 945,000，标记距离下一次减半的中点。网络安全性持续增强。</div>
+            <div class="news-source">CoinMarketCap</div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-title">6. 日本 80% 机构投资者计划 3 年内配置加密资产</div>
+            <div class="news-summary">野村证券调查显示约 80% 的日本投资专业人士计划在 2029 年前将最多 5% 的投资组合分配给数字资产，亚洲机构入场加速。</div>
+            <div class="news-source">CoinDesk</div>
+        </div>
+
+        <div class="news-item">
+            <div class="news-title">7. Morgan Stanley BTC ETF 规模突破 $1 亿</div>
+            <div class="news-summary">继上周首日流入 $3,400 万后，Morgan Stanley 的比特币 ETF 产品持续获得机构资金净流入。</div>
+            <div class="news-source">CoinGabbar</div>
+        </div>
+    </div>
+
+    <!-- Risk -->
+    <div class="risk-box">
+        <div class="risk-title">⚠️ 风险提示</div>
+        <ul>
+            <li>恐慌贪婪指数 32 处于<strong>恐惧</strong>区间，市场情绪低迷，短线反弹持续性存疑</li>
+            <li>BTC/ETH/SOL 三币日线均处于<strong>死亡交叉</strong>（EMA50 < EMA200），中期下行趋势未扭转</li>
+            <li>地缘政治风险持续：美伊谈判停滞、霍尔木兹海峡局势紧张</li>
+            <li>CLARITY 法案若未能按预期通过，可能引发市场短期回调</li>
+            <li>SOL 距 52 周低点仅 20%，底部结构不明确，抄底风险极高</li>
+            <li>本报告仅供 CLAW CAPITAL 内部参考，不构成投资建议</li>
+        </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>CLAW CAPITAL © 2026 · 内部技术分析报告 · 仅供团队参考</p>
+        <p style="margin-top:4px;">数据来源：CoinGecko / CoinLore / Alternative.me / CoinDesk</p>
+    </div>
+
+</div>
+</body>
+</html>
